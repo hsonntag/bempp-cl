@@ -27,6 +27,7 @@ def select_numba_kernels(operator_descriptor, mode="regular"):
     }
     assembly_function_potential = {
         "default_scalar": default_scalar_potential_kernel,
+        "laplace_single_layer_gradient": default_scalar_potential_kernel,
         "maxwell_electric_field": maxwell_efield_potential,
         "maxwell_magnetic_field": maxwell_mfield_potential,
         "maxwell_magnetic_far_field": maxwell_mfield_far_field,
@@ -38,6 +39,8 @@ def select_numba_kernels(operator_descriptor, mode="regular"):
     kernel_functions_regular = {
         "laplace_single_layer": laplace_single_layer_regular,
         "laplace_double_layer": laplace_double_layer_regular,
+        "laplace_single_layer_gradient": laplace_single_layer_gradient_regular,
+        "laplace_double_layer_gradient": laplace_double_layer_gradient_regular,
         "laplace_adjoint_double_layer": laplace_adjoint_double_layer_regular,
         "helmholtz_single_layer": helmholtz_single_layer_regular,
         "helmholtz_double_layer": helmholtz_double_layer_regular,
@@ -208,6 +211,33 @@ def laplace_single_layer_regular(
 @_numba.jit(
     nopython=True, parallel=False, error_model="numpy", fastmath=True, boundscheck=False
 )
+def laplace_single_layer_gradient_regular(
+    test_point, trial_points, test_normal, trial_normals, kernel_parameters
+):
+    """Evaluate Laplace single layer gradient for regular kernels."""
+    npoints = trial_points.shape[1]
+    dtype = trial_points.dtype
+    output = _np.zeros((3, npoints), dtype=dtype)
+    diff = _np.empty((3, npoints), dtype=dtype)
+    dist = _np.zeros(npoints, dtype=dtype)
+    m_inv_4pi = dtype.type(M_INV_4PI)
+    for i in range(3):
+        for j in range(npoints):
+            diff[i, j] = trial_points[i, j] - test_point[i]
+            dist[j] += diff[i, j] * diff[i, j]
+    for j in range(npoints):
+        dist[j] = _np.sqrt(dist[j])
+    for i in range(3):
+        for j in range(npoints):
+            output[i, j] += diff[i, j]
+    for j in range(npoints):
+        output[:, j] *= -m_inv_4pi / (dist[j] * dist[j] * dist[j])
+    return output
+
+
+@_numba.jit(
+    nopython=True, parallel=False, error_model="numpy", fastmath=True, boundscheck=False
+)
 def laplace_double_layer_regular(
     test_point, trial_points, test_normal, trial_normals, kernel_parameters
 ):
@@ -229,6 +259,35 @@ def laplace_double_layer_regular(
             output[j] += diff[i, j] * trial_normals[i, j]
     for j in range(npoints):
         output[j] *= -m_inv_4pi / (dist[j] * dist[j] * dist[j])
+    return output
+
+
+@_numba.jit(
+    nopython=True, parallel=False, error_model="numpy", fastmath=True, boundscheck=False
+)
+def laplace_double_layer_gradient_regular(
+    test_point, trial_points, test_normal, trial_normals, kernel_parameters
+):
+    """Evaluate Laplace double layer gradient for regular kernels."""
+    npoints = trial_points.shape[1]
+    dtype = trial_points.dtype
+    output = _np.zeros((3, npoints), dtype=dtype)
+    diff = _np.empty((3, npoints), dtype=dtype)
+    dist = _np.zeros(npoints, dtype=dtype)
+    m_inv_4pi = dtype.type(M_INV_4PI)
+    for i in range(3):
+        for j in range(npoints):
+            diff[i, j] = trial_points[i, j] - test_point[i]
+            dist[j] += diff[i, j] * diff[i, j]
+    for j in range(npoints):
+        dist[j] = _np.sqrt(dist[j])
+        output[0, j] = trial_normals[0, j] * (dist[j] * dist[j] - 3 * diff[0, j] * diff[0, j]) \
+            -3 * diff[0, j] * (trial_normals[1, j] * diff[1, j] + trial_normals[2, j] * diff[2, j])
+        output[1, j] = trial_normals[1, j] * (dist[j] * dist[j] - 3 * diff[1, j] * diff[1, j]) \
+            -3 * diff[1, j] * (trial_normals[0, j] * diff[0, j] + trial_normals[2, j] * diff[2, j])
+        output[2, j] = trial_normals[2, j] * (dist[j] * dist[j] - 3 * diff[2, j] * diff[2, j]) \
+            -3 * diff[2, j] * (trial_normals[0, j] * diff[0, j] + trial_normals[1, j] * diff[1, j])
+        output[:, j] *= -m_inv_4pi / (dist[j] * dist[j] * dist[j] * dist[j] * dist[j])
     return output
 
 

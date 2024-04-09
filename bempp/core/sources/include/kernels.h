@@ -178,6 +178,108 @@ inline void laplace_double_layer_vec16(const REALTYPE3 testGlobalPoint,
 
 }
 
+inline void laplace_single_layer_gradient_novec(const REALTYPE3 testGlobalPoint,
+                                         const REALTYPE3 trialGlobalPoint,
+                                         const REALTYPE3 testNormal,
+                                         const REALTYPE3 trialNormal,
+                                         __global REALTYPE* kernel_parameters,
+                                         REALTYPE result[3])
+{
+    // Compute the derivative with respect to the test point.
+    REALTYPE3 diff = trialGlobalPoint - testGlobalPoint;
+    REALTYPE dist = length(diff);
+
+    REALTYPE factor = M_INV_4PI / (dist * dist * dist);
+
+    result[0] = factor * diff.x;
+    result[1] = factor * diff.y;
+    result[2] = factor * diff.z;
+
+}
+
+inline void laplace_single_layer_gradient_vec4(const REALTYPE3 testGlobalPoint,
+                                      const REALTYPE4 trialGlobalPoint[3],
+                                      const REALTYPE3 testNormal,
+                                      const REALTYPE4 trialNormal[3],
+                                      __global REALTYPE* kernel_parameters,
+                                      REALTYPE4 result[3])
+{
+    // Compute the derivative with respect to the test point.
+    // Corresponding minus sign multiplied into the factor variable.
+    REALTYPE4 diff[3];
+    REALTYPE4 rdist;
+
+    diff_vec4(testGlobalPoint, trialGlobalPoint, diff);
+    rdist = rsqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+    REALTYPE4 factor;
+
+    factor = -M_INV_4PI * (rdist * rdist * rdist);
+
+    result[0] = factor * diff[0];
+    result[1] = factor * diff[1];
+    result[2] = factor * diff[2];
+
+}
+
+inline void laplace_single_layer_gradient_vec8(const REALTYPE3 testGlobalPoint,
+                                      const REALTYPE8 trialGlobalPoint[3],
+                                      const REALTYPE3 testNormal,
+                                      const REALTYPE8 trialNormal[3],
+                                      __global REALTYPE* kernel_parameters,
+                                      REALTYPE8 result[3])
+{
+    // Compute the derivative with respect to the test point.
+    // Corresponding minus sign multiplied into the product variable.
+    REALTYPE8 diff[3];
+    REALTYPE8 dist;
+
+    diff_vec8(testGlobalPoint, trialGlobalPoint, diff);
+    dist = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+    REALTYPE8 product;
+
+    REALTYPE8 factor;
+
+    factor = M_INV_4PI / (dist * dist * dist);
+
+    product = -factor;
+
+    result[0] = product * diff[0];
+    result[1] = product * diff[1];
+    result[2] = product * diff[2];
+
+}
+
+inline void laplace_single_layer_gradient_vec16(const REALTYPE3 testGlobalPoint,
+                                       const REALTYPE16 trialGlobalPoint[3],
+                                       const REALTYPE3 testNormal,
+                                       const REALTYPE16 trialNormal[3],
+                                       __global REALTYPE* kernel_parameters,
+                                       REALTYPE16 result[3])
+{
+    // Compute the derivative with respect to the test point.
+    // Corresponding minus sign multiplied into the product variable.
+    REALTYPE16 diff[3];
+    REALTYPE16 dist;
+
+    diff_vec16(testGlobalPoint, trialGlobalPoint, diff);
+    dist = sqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+    REALTYPE16 product;
+
+    REALTYPE16 factor;
+
+    factor = M_INV_4PI / (dist * dist * dist);
+
+    product = -factor;
+
+    result[0] = product * diff[0];
+    result[1] = product * diff[1];
+    result[2] = product * diff[2];
+
+}
+
 inline void laplace_adjoint_double_layer_novec(const REALTYPE3 testGlobalPoint, 
                                                  const REALTYPE3 trialGlobalPoint, 
                                                  const REALTYPE3 testNormal,
@@ -966,6 +1068,7 @@ inline void helmholtz_gradient_vec8(const REALTYPE3 testGlobalPoint,
     result[2][1] = product[1] * diff[2];
 
 }
+
 inline void helmholtz_gradient_vec16(const REALTYPE3 testGlobalPoint, 
                                            const REALTYPE16 trialGlobalPoint[3], 
                                            const REALTYPE3 testNormal,
@@ -1007,6 +1110,7 @@ inline void helmholtz_gradient_vec16(const REALTYPE3 testGlobalPoint,
     result[2][1] = product[1] * diff[2];
 
 }
+
 inline void helmholtz_single_layer_far_field_novec(const REALTYPE3 testGlobalPoint, 
                                            const REALTYPE3 trialGlobalPoint, 
                                            const REALTYPE3 testNormal,
@@ -1047,6 +1151,7 @@ inline void helmholtz_single_layer_far_field_vec8(const REALTYPE3 testGlobalPoin
     result[0] = M_INV_4PI * cos(-kernel_parameters[0] * prod);
     result[1] = M_INV_4PI * sin(-kernel_parameters[0] * prod);
 }
+
 inline void helmholtz_single_layer_far_field_vec16(const REALTYPE3 testGlobalPoint, 
                                          const REALTYPE16 trialGlobalPoint[3], 
                                          const REALTYPE3 testNormal,

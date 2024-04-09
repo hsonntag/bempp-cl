@@ -36,6 +36,8 @@ def select_cl_kernel(operator_descriptor, mode):
 
     potential_assemblers = {
         "default_scalar": "evaluate_scalar_potential",
+        "laplace_single_layer_gradient": "evaluate_laplace_single_layer_gradient",
+        "laplace_double_layer_gradient": "evaluate_laplace_double_layer_gradient",
         "maxwell_electric_field": "evaluate_electric_field_potential",
         "maxwell_magnetic_field": "evaluate_magnetic_field_potential",
         "maxwell_electric_far_field": "evaluate_maxwell_electric_far_field",
@@ -45,6 +47,8 @@ def select_cl_kernel(operator_descriptor, mode):
     kernels = {
         "laplace_single_layer": "laplace_single_layer",
         "laplace_double_layer": "laplace_double_layer",
+        "laplace_single_layer_gradient": "laplace_single_layer_gradient",
+        "laplace_double_layer_gradient": "laplace_double_layer_gradient",
         "laplace_adjoint_double_layer": "laplace_adjoint_double_layer",
         "helmholtz_single_layer": "helmholtz_single_layer",
         "helmholtz_double_layer": "helmholtz_double_layer",
