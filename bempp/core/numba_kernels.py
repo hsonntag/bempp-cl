@@ -27,7 +27,7 @@ def select_numba_kernels(operator_descriptor, mode="regular"):
     }
     assembly_function_potential = {
         "default_scalar": default_scalar_potential_kernel,
-        "laplace_single_layer_gradient": default_scalar_potential_kernel,
+        "laplace_gradient": default_scalar_potential_kernel,
         "maxwell_electric_field": maxwell_efield_potential,
         "maxwell_magnetic_field": maxwell_mfield_potential,
         "maxwell_magnetic_far_field": maxwell_mfield_far_field,

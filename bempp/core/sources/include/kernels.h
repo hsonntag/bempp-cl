@@ -280,6 +280,89 @@ inline void laplace_single_layer_gradient_vec16(const REALTYPE3 testGlobalPoint,
 
 }
 
+inline void laplace_double_layer_gradient_novec(const REALTYPE3 testGlobalPoint,
+                                         const REALTYPE3 trialGlobalPoint,
+                                         const REALTYPE3 testNormal,
+                                         const REALTYPE3 trialNormal,
+                                         __global REALTYPE* kernel_parameters,
+                                         REALTYPE result[3])
+{
+    REALTYPE3 diff = trialGlobalPoint - testGlobalPoint;
+    REALTYPE dist = length(diff);
+
+    REALTYPE3 summand1 = trialNormal / (dist * dist * dist);
+    REALTYPE3 summand2 = -3 * dot(diff, trialNormal) * diff / (dist * dist * dist * dist * dist);
+
+    result[0] = M_INV_4PI * (summand1.x + summand2.x);
+    result[1] = M_INV_4PI * (summand1.y + summand2.y);
+    result[2] = M_INV_4PI * (summand1.z + summand2.z);
+
+}
+
+inline void laplace_double_layer_gradient_vec4(const REALTYPE3 testGlobalPoint,
+                                         const REALTYPE4 trialGlobalPoint[3],
+                                         const REALTYPE3 testNormal,
+                                         const REALTYPE4 trialNormal[3],
+                                         __global REALTYPE* kernel_parameters,
+                                         REALTYPE4 result[3])
+{
+    REALTYPE4 diff[3];
+    REALTYPE4 rdist;
+
+    diff_vec4(testGlobalPoint, trialGlobalPoint, diff);
+    rdist = rsqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+    REALTYPE4 factor1 = -1 * (rdist * rdist * rdist);
+    REALTYPE4 factor2 = +3 * (rdist * rdist * rdist * rdist * rdist);
+
+    result[0] = -M_INV_4PI * (trialNormal[0] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[0] * factor2);
+    result[1] = -M_INV_4PI * (trialNormal[1] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[1] * factor2);
+    result[2] = -M_INV_4PI * (trialNormal[2] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[2] * factor2);
+
+}
+
+inline void laplace_double_layer_gradient_vec8(const REALTYPE3 testGlobalPoint,
+                                      const REALTYPE8 trialGlobalPoint[3],
+                                      const REALTYPE3 testNormal,
+                                      const REALTYPE8 trialNormal[3],
+                                      __global REALTYPE* kernel_parameters,
+                                      REALTYPE8 result[3])
+{
+    REALTYPE8 diff[3];
+    REALTYPE8 rdist;
+
+    diff_vec8(testGlobalPoint, trialGlobalPoint, diff);
+    rdist = rsqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+    REALTYPE8 factor1 = -1 * (rdist * rdist * rdist);
+    REALTYPE8 factor2 = +3 * (rdist * rdist * rdist * rdist * rdist);
+
+    result[0] = -M_INV_4PI * (trialNormal[0] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[0] * factor2);
+    result[1] = -M_INV_4PI * (trialNormal[1] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[1] * factor2);
+    result[2] = -M_INV_4PI * (trialNormal[2] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[2] * factor2);
+}
+
+inline void laplace_double_layer_gradient_vec16(const REALTYPE3 testGlobalPoint,
+                                       const REALTYPE16 trialGlobalPoint[3],
+                                       const REALTYPE3 testNormal,
+                                       const REALTYPE16 trialNormal[3],
+                                       __global REALTYPE* kernel_parameters,
+                                       REALTYPE16 result[3])
+{
+    REALTYPE16 diff[3];
+    REALTYPE16 rdist;
+
+    diff_vec16(testGlobalPoint, trialGlobalPoint, diff);
+    rdist = rsqrt(diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2]);
+
+    REALTYPE16 factor1 = -1 * (rdist * rdist * rdist);
+    REALTYPE16 factor2 = +3 * (rdist * rdist * rdist * rdist * rdist);
+
+    result[0] = -M_INV_4PI * (trialNormal[0] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[0] * factor2);
+    result[1] = -M_INV_4PI * (trialNormal[1] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[1] * factor2);
+    result[2] = -M_INV_4PI * (trialNormal[2] * factor1 + (diff[0] * trialNormal[0] + diff[1] * trialNormal[1] + diff[2] * trialNormal[2]) * diff[2] * factor2);
+}
+
 inline void laplace_adjoint_double_layer_novec(const REALTYPE3 testGlobalPoint, 
                                                  const REALTYPE3 trialGlobalPoint, 
                                                  const REALTYPE3 testNormal,

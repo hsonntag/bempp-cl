@@ -57,7 +57,7 @@ def single_layer_gradient(
         "laplace_single_layer_potential_gradient",  # Identifier
         [],  # Options
         "laplace_single_layer_gradient",  # Kernel type
-        "laplace_single_layer_gradient",  # Assembly type
+        "laplace_gradient",  # Assembly type
         precision,  # Precision
         False,  # Is complex
         None,  # Singular part
@@ -126,7 +126,7 @@ def double_layer_gradient(
         "laplace_double_layer_potential_gradient",  # Identifier
         [],  # Options
         "laplace_double_layer_gradient",  # Kernel type
-        "laplace_double_layer_gradient",  # Assembly type
+        "laplace_gradient",  # Assembly type
         precision,  # Precision
         False,  # Is complex
         None,  # Singular part
