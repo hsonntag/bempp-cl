@@ -43,6 +43,11 @@ __kernel void kernel_function(__global REALTYPE *grid,
       (REALTYPE3)(evalPoints[3 * gid[0] + 0], evalPoints[3 * gid[0] + 1],
                   evalPoints[3 * gid[0] + 2]);
 
+  // printf("gid0 = %d\n", gid[0]);
+  // printf("gid1 = %d\n", gid[1]);
+  // printf("lid = %d\n", lid);
+  // printf("groupId = %d\n", groupId);
+  // printf("numGroups = %d\n", numGroups);
   // printf("novec\n");
 #ifndef COMPLEX_RESULT
   __local REALTYPE localResult[WORKGROUP_SIZE][3];
@@ -113,9 +118,9 @@ __kernel void kernel_function(__global REALTYPE *grid,
       localResult[0][1] += localResult[index][1];
       localResult[0][2] += localResult[index][2];
     }
-    globalResult[3 * (gid[0] * numGroups + groupId)] += localResult[0][0];
-    globalResult[3 * (gid[0] * numGroups + groupId) + 1] += localResult[0][1];
-    globalResult[3 * (gid[0] * numGroups + groupId) + 2] += localResult[0][2];
+    globalResult[(3 * gid[0]) * numGroups + groupId] += localResult[0][0];
+    globalResult[(3 * gid[0] + 1) * numGroups + groupId] += localResult[0][1];
+    globalResult[(3 * gid[0] + 2) * numGroups + groupId] += localResult[0][2];
 
   }
 
