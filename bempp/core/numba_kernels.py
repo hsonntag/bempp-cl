@@ -231,7 +231,7 @@ def laplace_single_layer_gradient_regular(
         for j in range(npoints):
             output[i, j] += diff[i, j]
     for j in range(npoints):
-        output[:, j] *= -m_inv_4pi / (dist[j] * dist[j] * dist[j])
+        output[:, j] *= m_inv_4pi / (dist[j] * dist[j] * dist[j])
     return output
 
 
@@ -287,7 +287,7 @@ def laplace_double_layer_gradient_regular(
             -3 * diff[1, j] * (trial_normals[0, j] * diff[0, j] + trial_normals[2, j] * diff[2, j])
         output[2, j] = trial_normals[2, j] * (dist[j] * dist[j] - 3 * diff[2, j] * diff[2, j]) \
             -3 * diff[2, j] * (trial_normals[0, j] * diff[0, j] + trial_normals[1, j] * diff[1, j])
-        output[:, j] *= -m_inv_4pi / (dist[j] * dist[j] * dist[j] * dist[j] * dist[j])
+        output[:, j] *= m_inv_4pi / (dist[j] * dist[j] * dist[j] * dist[j] * dist[j])
     return output
 
 
