@@ -135,7 +135,7 @@ class _ProductDiscreteOperator(_DiscreteOperatorBase):
         self._op1 = op1
         self._op2 = op2
 
-        dtype = _np.find_common_type([op1.dtype, op2.dtype], [])
+        dtype = _np.promote_types(op1.dtype, op2.dtype)
 
         super().__init__(dtype, (op1.shape[0], op2.shape[1]))
 
